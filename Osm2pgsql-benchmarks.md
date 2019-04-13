@@ -222,5 +222,82 @@ Osm2pgsql took 108673s overall
 
 ```
 
+## Console Output AMD Threadripper 16 core 128 GB
 
+```
+ubuntu@ls01:~/osm$ sudo docker run --shm-size 14g -e THREADS=24 -v /home/ubuntu/osm/europe-latest.osm.pbf:/data.osm.pbf -v openstreetmap-test-data:/var/li
+b/postgresql/10/main a-hahn/openstreetmap-tile-server import
+[sudo] password for ubuntu:
+ * Starting PostgreSQL 10 database server
+   ...done.
+createuser: creation of new role failed: ERROR:  role "renderer" already exists
+createdb: database creation failed: ERROR:  database "gis" already exists
+ERROR:  extension "postgis" already exists
+ERROR:  extension "hstore" already exists
+ALTER TABLE
+ALTER TABLE
+osm2pgsql version 0.96.0 (64 bit id space)
 
+Allocating memory for dense node cache
+Allocating dense node cache in one big chunk
+Allocating memory for sparse node cache
+Sharing dense sparse
+Node-cache: cache=2048MB, maxblocks=32768*65536, allocation method=11
+Mid: pgsql, cache=2048
+Setting up table: planet_osm_nodes
+Setting up table: planet_osm_ways
+Setting up table: planet_osm_rels
+Using lua based tag processing pipeline with script /home/renderer/src/openstreetmap-carto/openstreetmap-carto.lua
+Using projection SRS 3857 (Spherical Mercator)
+Setting up table: planet_osm_point
+Setting up table: planet_osm_line
+Setting up table: planet_osm_polygon
+Setting up table: planet_osm_roads
+
+Reading in file: /data.osm.pbf
+Using PBF parser.
+Processing: Node(2127685k 376.5k/s) Way(258523k 7.53k/s) Relation(4078630 552.59/s)  parse time: 47355s
+Node stats: total(2127685951), max(5830570214) in 5651s
+Way stats: total(258523395), max(616760012) in 34323s
+Relation stats: total(4079049), max(8529566) in 7381s
+Sorting data and creating indexes for planet_osm_point
+Sorting data and creating indexes for planet_osm_polygon
+Sorting data and creating indexes for planet_osm_roads
+Sorting data and creating indexes for planet_osm_line
+Stopping table: planet_osm_nodes
+Stopping table: planet_osm_ways
+Stopping table: planet_osm_rels
+Stopped table: planet_osm_nodes in 0s
+Building index on table: planet_osm_rels
+Building index on table: planet_osm_ways
+Copying planet_osm_roads to cluster by geometry finished
+Creating geometry index on planet_osm_roads
+Stopped table: planet_osm_rels in 702s
+Creating osm_id index on planet_osm_roads
+Creating indexes on planet_osm_roads finished
+All indexes on planet_osm_roads created in 849s
+Completed planet_osm_roads
+Copying planet_osm_point to cluster by geometry finished
+Creating geometry index on planet_osm_point
+Copying planet_osm_line to cluster by geometry finished
+Creating geometry index on planet_osm_line
+Creating osm_id index on planet_osm_point
+Creating indexes on planet_osm_point finished
+All indexes on planet_osm_point created in 3313s
+Completed planet_osm_point
+Creating osm_id index on planet_osm_line
+Creating indexes on planet_osm_line finished
+All indexes on planet_osm_line created in 4462s
+Completed planet_osm_line
+Copying planet_osm_polygon to cluster by geometry finished
+Creating geometry index on planet_osm_polygon
+Creating osm_id index on planet_osm_polygon
+Creating indexes on planet_osm_polygon finished
+All indexes on planet_osm_polygon created in 16500s
+Completed planet_osm_polygon
+Stopped table: planet_osm_ways in 18584s
+
+Osm2pgsql took 65941s overall
+node cache: stored: 182725423(8.59%), storage efficiency: 68.07% (dense blocks: 13891, sparse nodes: 77321641), hit rate: 10.20%
+ubuntu@ls01:~/osm$ 
+```
