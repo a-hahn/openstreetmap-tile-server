@@ -46,6 +46,24 @@ if [ "$1" = "run" ]; then
     exit 0
 fi
 
+# Same as 'run' command but with additonal deletion of shm-file
+if [ "$1" = "run2" ]; then
+    rm /tmp/httpd_shm.63
+    rm /tmp/httpd_shm_delay.63
+    
+    # Initialize PostgreSQL and Apache
+    service postgresql start
+    service apache2 restart
+
+    # Configure renderd threads
+    sed -i -E "s/num_threads=[0-9]+/num_threads=${THREADS:-4}/g" /usr/local/etc/renderd.conf
+
+    # Run
+    sudo -u renderer renderd -f -c /usr/local/etc/renderd.conf
+
+    exit 0
+fi
+
 if [ "$1" = "debug" ]; then
     echo "You are in debug mode"
     echo "Useful commands:"
