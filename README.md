@@ -20,6 +20,14 @@ Run the server like this:
 
     docker run --shm-size 14g -p 80:80 -v osm-europe-data:/var/lib/postgresql/10/main -v /home/ubuntu/osm:/etc/postgresql/10/main/conf.d a-hahn/openstreetmap-tile-server:latest run
 
+or
+
+    sudo docker run -p 80:80 -e THREADS=16 --shm-size 8g --memory 64g --memory-swap 64g \
+	-v osm-europe-data:/var/lib/postgresql/10/main \
+	-v osm-europe-tiles:/var/lib/mod_tile \
+	-v /home/ubuntu/osm/conf.d:/etc/postgresql/10/main/conf.d \
+	--name osm-europe-service --restart always --tmpfs /tmp -d a-hahn/openstreetmap-tile-server run
+
 Your tiles will now be available at http://localhost:80/tile/{z}/{x}/{y}.png. If you open `leaflet-demo.html` in your browser, you should be able to see the tiles served by your own machine. Note that it will initially quite a bit of time to render the larger tiles for the first time.
 
 ## Debugging the service mode
