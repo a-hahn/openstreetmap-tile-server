@@ -55,6 +55,15 @@ docker run -p 80:80 -v openstreetmap-data:/var/lib/postgresql/10/main -v openstr
 
 ## Performance tuning
 
+### Disable frequent rendering
+
+When the geo datasets are not updated at all then its very efficient to render the tiles only once and keep them in cache. This can be done with a file ``planet-import-complete`` that has an older historical date.
+```
+sudo docker exec -it osm-europe-service bash -c "touch -t 2001010101 /var/lib/mod_tile/planet-import-complete"
+```
+This command sets the timestamp of 'planet-import-complete' to 2020/01/01 01:01
+
+### Modify threads
 The import and tile serving processes use 4 threads by default, but this number can be changed by setting the `THREADS` environment variable. For example:
 
 ```
