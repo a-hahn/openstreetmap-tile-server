@@ -15,7 +15,11 @@ docker build -t a-hahn/openstreetmap-data .
 
 Next, download an .osm.pbf extract from geofabrik.de for the region that you're interested in. You can then start importing it into PostgreSQL by running a container and mounting the file as `/data.osm.pbf`. For example:
 ```
-    docker run -v /absolute/path/to/luxembourg.osm.pbf:/data.osm.pbf -v openstreetmap-data:/var/lib/postgresql/10/main a-hahn/openstreetmap-tile-server import
+docker run \
+-v /absolute/path/to/luxembourg.osm.pbf:/data.osm.pbf \
+-v openstreetmap-data:/var/lib/postgresql/10/main \
+a-hahn/openstreetmap-tile-server \
+import
 ```
 If the container exits without errors, then your data has been successfully imported and you are now ready to run the tile server.
 
@@ -23,16 +27,28 @@ If the container exits without errors, then your data has been successfully impo
 
 Run the server like this:
 ```
-docker run --shm-size 14g -p 80:80 -v osm-europe-data:/var/lib/postgresql/10/main -v /home/ubuntu/osm:/etc/postgresql/10/main/conf.d a-hahn/openstreetmap-tile-server:latest run
+docker run --shm-size 14g -p 8880:80 \
+-v osm-europe-data:/var/lib/postgresql/10/main \
+-v /home/ubuntu/osm:/etc/postgresql/10/main/conf.d \
+docker.pkg.github.com/a-hahn/openstreetmap-tile-server/osm-docker:latest \
+run
 ```
-
 or
 
-    sudo docker run -p 80:80 -e THREADS=16 --shm-size 8g --memory 64g --memory-swap 64g \
-	-v osm-europe-data:/var/lib/postgresql/10/main \
-	-v osm-europe-tiles:/var/lib/mod_tile \
-	-v /home/ubuntu/osm/conf.d:/etc/postgresql/10/main/conf.d \
-	--name osm-europe-service --restart always --tmpfs /tmp -d a-hahn/openstreetmap-tile-server run
+```
+sudo docker run -d \
+-p 8880:80 \
+-e THREADS=16 \
+--shm-size 8g --memory 64g --memory-swap 64g \
+-v osm-europe-data:/var/lib/postgresql/10/main \
+-v osm-europe-tiles:/var/lib/mod_tile \
+-v /home/ubuntu/osm/conf.d:/etc/postgresql/10/main/conf.d \
+--tmpfs /tmp \
+--restart always \
+--name osm-europe-service \
+docker.pkg.github.com/a-hahn/openstreetmap-tile-server/osm-docker:latest \
+run
+```
 
 Your tiles will now be available at http://localhost:80/tile/{z}/{x}/{y}.png. If you open `leaflet-demo.html` in your browser, you should be able to see the tiles served by your own machine. Note that it will initially quite a bit of time to render the larger tiles for the first time.
 
@@ -41,7 +57,13 @@ Your tiles will now be available at http://localhost:80/tile/{z}/{x}/{y}.png. If
 Just substitute the 'run' command with 'debug' like so:
 
 ```
-docker run --shm-size 14g -p 80:80 -v osm-europe-data:/var/lib/postgresql/10/main -v /home/ubuntu/osm:/etc/postgresql/10/main/conf.d a-hahn/openstreetmap-tile-server:latest debug
+docker run \
+--shm-size 14g \
+-p 80:80 \
+-v osm-europe-data:/var/lib/postgresql/10/main \
+-v /home/ubuntu/osm:/etc/postgresql/10/main/conf.d \
+a-hahn/openstreetmap-tile-server:latest \
+debug
 ```
 
 ## Preserving rendered tiles
@@ -50,7 +72,12 @@ Tiles that have already been rendered will be stored in `/var/lib/mod_tile`. To 
 
 ```
 docker volume create openstreetmap-rendered-tiles
-docker run -p 80:80 -v openstreetmap-data:/var/lib/postgresql/10/main -v openstreetmap-rendered-tiles:/var/lib/mod_tile -d a-hahn/openstreetmap-tile-server run
+docker run -d \
+-p 80:80 \
+-v openstreetmap-data:/var/lib/postgresql/10/main \
+-v openstreetmap-rendered-tiles:/var/lib/mod_tile \
+a-hahn/openstreetmap-tile-server \
+run
 ```
 
 ## Performance tuning
@@ -67,7 +94,12 @@ This command sets the timestamp of 'planet-import-complete' to 2020/01/01 01:01
 The import and tile serving processes use 4 threads by default, but this number can be changed by setting the `THREADS` environment variable. For example:
 
 ```
-docker run -p 80:80 -e THREADS=24 -v openstreetmap-data:/var/lib/postgresql/10/main -d a-hahn/openstreetmap-tile-server run
+docker run \
+-p 80:80 \
+-e THREADS=24 \
+-v openstreetmap-data:/var/lib/postgresql/10/main \
+-d a-hahn/openstreetmap-tile-server \
+run
 ```
 
 ## License
